@@ -19,7 +19,8 @@
     "mp2"
   ],
   "files": [
-    "dist",
+    "index.js",
+    "src",
     "README.md"
   ],
   "author": "Dominic Szablewski",
