@@ -117,9 +117,9 @@ Player.prototype.stop = function(ev) {
 
 Player.prototype.destroy = function() {
 	this.pause();
-	this.source.destroy();
-	this.renderer.destroy();
-	this.audioOut.destroy();
+	if (this.hasOwnProperty('source'))   { this.source.destroy(); }
+	if (this.hasOwnProperty('renderer')) { this.renderer.destroy(); }
+	if (this.hasOwnProperty('audioOut')) { this.audioOut.destroy(); }
 };
 
 Player.prototype.seek = function(time) {
