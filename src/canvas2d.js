@@ -1,5 +1,10 @@
 import {Fill} from './jsmpeg';
 
+var PRELOADER = {
+	borderWidth: 1, // %
+	color: '#FC6060'
+};
+
 export var CanvasRenderer = function(options) {
 	this.canvas = options.canvas || document.createElement('canvas');
 	this.width = this.canvas.width;
@@ -25,16 +30,17 @@ CanvasRenderer.prototype.resize = function(width, height) {
 };
 
 CanvasRenderer.prototype.renderProgress = function(progress) {
-	var 
+	var
+		ctx = this.context,
 		w = this.canvas.width,
 		h = this.canvas.height,
-		ctx = this.context;
+		x = w * progress,
+		y = (h / 100) * PRELOADER.borderWidth;
 
-	ctx.fillStyle = '#222';
-	ctx.fillRect(0, 0, w, h);
-	ctx.fillStyle = '#fff';
-	ctx.fillRect(0, h - h * progress, w, h * progress);
-};
+	ctx.fillStyle = PRELOADER.color;
+	ctx.fillRect(0,0,x,y)
+}
+
 
 CanvasRenderer.prototype.render = function(y, cb, cr) {
 	this.YCbCrToRGBA(y, cb, cr, this.imageData.data);
@@ -51,7 +57,7 @@ CanvasRenderer.prototype.YCbCrToRGBA = function(y, cb, cr, rgba) {
 	// I wish we could use 32bit writes to the RGBA buffer instead of writing
 	// each byte separately, but we need the automatic clamping of the RGBA
 	// buffer.
-	
+
 	var w = ((this.width + 15) >> 4) << 4,
 		w2 = w >> 1;
 
