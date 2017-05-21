@@ -6,6 +6,7 @@ export var AjaxSource = function(url, options) {
 	this.completed = false;
 	this.established = false;
 	this.progress = 0;
+	this.options = options
 };
 
 AjaxSource.prototype.connect = function(destination) {
@@ -17,7 +18,7 @@ AjaxSource.prototype.start = function() {
 
 	this.request.onreadystatechange = function() {
 		if (
-			this.request.readyState === this.request.DONE && 
+			this.request.readyState === this.request.DONE &&
 			this.request.status === 200
 		) {
 			this.onLoad(this.request.response);
@@ -25,7 +26,8 @@ AjaxSource.prototype.start = function() {
 	}.bind(this);
 
 	this.request.onprogress = this.onProgress.bind(this);
-	this.request.open('GET', this.url);
+	this.request.open('GET', this.url, true);
+	this.request.setRequestHeader("Cache-Control", "max-age=" + 60*60*24*2 + ", must-revalidate")
 	this.request.responseType = "arraybuffer";
 	this.request.send();
 };
@@ -46,9 +48,11 @@ AjaxSource.prototype.onLoad = function(data) {
 	this.established = true;
 	this.completed = true;
 	this.progress = 1;
-
 	if (this.destination) {
 		this.destination.write(data);
+	}
+  if (this.options.onLoad) {
+		this.options.onLoad()
 	}
 };
 

@@ -14,6 +14,10 @@ export var CanvasRenderer = function(options) {
 	this.context = this.canvas.getContext('2d');
 };
 
+CanvasRenderer.prototype.remove = function() {
+	// Nothing to do here
+};
+
 CanvasRenderer.prototype.destroy = function() {
 	// Nothing to do here
 };

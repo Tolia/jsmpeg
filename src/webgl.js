@@ -12,8 +12,8 @@ export var WebGLRenderer = function(options) {
 		antialias: false
 	};
 
-	this.gl = 
-		this.canvas.getContext('webgl', contextCreateOptions) || 
+	this.gl =
+		this.canvas.getContext('webgl', contextCreateOptions) ||
 		this.canvas.getContext('experimental-webgl', contextCreateOptions);
 
 	if (!this.gl) {
@@ -55,9 +55,16 @@ export var WebGLRenderer = function(options) {
 	this.shouldCreateUnclampedViews = !this.allowsClampedTextureData();
 };
 
+WebGLRenderer.prototype.remove = function() {
+	var gl = this.gl;
+	var context = gl.getExtension('WEBGL_lose_context');
+	if (context) { context.loseContext(); }
+	this.destroy()
+}
+
 WebGLRenderer.prototype.destroy = function() {
 	var gl = this.gl;
-	
+
 	gl.deleteTexture(this.textureY);
 	gl.deleteTexture(this.textureCb);
 	gl.deleteTexture(this.textureCr);
@@ -137,7 +144,7 @@ WebGLRenderer.prototype.renderProgress = function(progress) {
 
 	var loc = gl.getUniformLocation(this.loadingProgram, 'progress');
 	gl.uniform1f(loc, progress);
-	
+
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 };
 
@@ -153,12 +160,12 @@ WebGLRenderer.prototype.render = function(y, cb, cr) {
 		h2 = h >> 1;
 
 	// In some browsers WebGL doesn't like Uint8ClampedArrays (this is a bug
-	// and should be fixed soon-ish), so we have to create a Uint8Array view 
+	// and should be fixed soon-ish), so we have to create a Uint8Array view
 	// for each plane.
 	if (this.shouldCreateUnclampedViews) {
 		y = new Uint8Array(y.buffer),
 		cb = new Uint8Array(cb.buffer),
-		cr = new Uint8Array(cr.buffer);	
+		cr = new Uint8Array(cr.buffer);
 	}
 
 	gl.useProgram(this.program);
@@ -175,7 +182,7 @@ WebGLRenderer.prototype.updateTexture = function(unit, texture, w, h, data) {
 	gl.activeTexture(unit);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.texImage2D(
-		gl.TEXTURE_2D, 0, gl.LUMINANCE, w, h, 0, 
+		gl.TEXTURE_2D, 0, gl.LUMINANCE, w, h, 0,
 		gl.LUMINANCE, gl.UNSIGNED_BYTE, data
 	);
 }
@@ -186,15 +193,15 @@ WebGLRenderer.IsSupported = function() {
 			return false;
 		}
 
-		var canvas = document.createElement('canvas'); 
+		var canvas = document.createElement('canvas');
 		return !!(
-			canvas.getContext('webgl') || 
+			canvas.getContext('webgl') ||
 			canvas.getContext('experimental-webgl')
 		);
 	}
 	catch (err) {
 		return false;
-	} 
+	}
 };
 
 WebGLRenderer.SHADER = {

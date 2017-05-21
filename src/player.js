@@ -37,6 +37,7 @@ export var Player = function(url, options) {
 		this.renderer = !options.disableGl && WebGLRenderer.IsSupported()
 			? new WebGLRenderer(options)
 			: new CanvasRenderer(options);
+
 		this.demuxer.connect(TS.STREAM.VIDEO_1, this.video);
 		this.video.connect(this.renderer);
 	}
@@ -115,11 +116,24 @@ Player.prototype.stop = function(ev) {
 	}
 };
 
+Player.prototype.remove = function() {
+	this.pause();
+	if (this.hasOwnProperty('renderer'))
+		this.renderer.remove();
+	if (this.hasOwnProperty('audioOut'))
+		this.audioOut.destroy();
+	if (this.hasOwnProperty('source'))
+		this.source.destroy();
+};
+
 Player.prototype.destroy = function() {
 	this.pause();
-	if (this.hasOwnProperty('source'))   { this.source.destroy(); }
-	if (this.hasOwnProperty('renderer')) { this.renderer.destroy(); }
-	if (this.hasOwnProperty('audioOut')) { this.audioOut.destroy(); }
+	if (this.hasOwnProperty('renderer'))
+		this.renderer.destroy();
+	if (this.hasOwnProperty('audioOut'))
+		this.audioOut.destroy();
+	if (this.hasOwnProperty('source'))
+		this.source.destroy();
 };
 
 Player.prototype.seek = function(time) {
@@ -151,7 +165,9 @@ Player.prototype.update = function() {
 	this.animationId = requestAnimationFrame(this.update.bind(this));
 
 	if (!this.source.established) {
-		if (this.renderer) {
+		if (this.options.hasOwnProperty('renderProgress')) {
+			this.options.renderProgress(this.source.progress);
+		} else if (this.renderer) {
 			this.renderer.renderProgress(this.source.progress);
 		}
 		return;
