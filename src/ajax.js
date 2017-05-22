@@ -27,7 +27,6 @@ AjaxSource.prototype.start = function() {
 
 	this.request.onprogress = this.onProgress.bind(this);
 	this.request.open('GET', this.url, true);
-	this.request.setRequestHeader("Cache-Control", "max-age=" + 60*60*24*2 + ", must-revalidate")
 	this.request.responseType = "arraybuffer";
 	this.request.send();
 };

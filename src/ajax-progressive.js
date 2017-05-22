@@ -1,6 +1,7 @@
 import {Now} from './jsmpeg';
 
 export var AjaxProgressiveSource = function(url, options) {
+	this.options = options;
 	this.url = url;
 	this.destination = null;
 	this.request = null;
@@ -28,15 +29,15 @@ AjaxProgressiveSource.prototype.start = function() {
 
 	this.request.onreadystatechange = function() {
 		if (this.request.readyState === this.request.DONE) {
-			this.fileSize = parseInt(
-				this.request.getResponseHeader("Content-Length")
-			);
+			var length = this.request.getResponseHeader("Content-Length")
+			console.log(this.request.getAllResponseHeaders())
+			this.fileSize = parseInt(length);
 			this.loadNextChunk();
 		}
 	}.bind(this);
 
 	this.request.onprogress = this.onProgress.bind(this);
-	this.request.open('HEAD', this.url);
+	this.request.open('HEAD', this.url, true);
 	this.request.send();
 };
 
@@ -61,19 +62,19 @@ AjaxProgressiveSource.prototype.destroy = function() {
 AjaxProgressiveSource.prototype.loadNextChunk = function() {
 	var start = this.loadedSize,
 		end = Math.min(this.loadedSize + this.chunkSize-1, this.fileSize-1);
-	
+
 	if (start >= this.fileSize || this.aborted) {
 		this.completed = true;
 		return;
 	}
-	
+
 	this.isLoading = true;
 	this.loadStartTime = Now();
 	this.request = new XMLHttpRequest();
 
-	this.request.onreadystatechange = function() {		
+	this.request.onreadystatechange = function() {
 		if (
-			this.request.readyState === this.request.DONE && 
+			this.request.readyState === this.request.DONE &&
 			this.request.status >= 200 && this.request.status < 300
 		) {
 			this.onChunkLoad(this.request.response);
@@ -85,12 +86,12 @@ AjaxProgressiveSource.prototype.loadNextChunk = function() {
 			}
 		}
 	}.bind(this);
-	
+
 	if (start === 0) {
 		this.request.onprogress = this.onProgress.bind(this);
 	}
 
-	this.request.open('GET', this.url+'?'+start+"-"+end);
+	this.request.open('GET', this.url+'#'+start+"-"+end, true);
 	this.request.setRequestHeader("Range", "bytes="+start+"-"+end);
 	this.request.responseType = "arraybuffer";
 	this.request.send();
@@ -114,6 +115,10 @@ AjaxProgressiveSource.prototype.onChunkLoad = function(data) {
 	this.loadTime = Now() - this.loadStartTime;
 	if (!this.throttled) {
 		this.loadNextChunk();
+	}
+
+	if (this.options.onLoad) {
+		this.options.onLoad();
 	}
 };
 
