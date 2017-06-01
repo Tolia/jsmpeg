@@ -68,11 +68,7 @@ WebAudioOut.prototype.play = function(sampleRate, left, right) {
 		this.wallclockStartTime = Now();
 	}
 
-	if (source.hasOwnProperty('noteOn')) {
-		source.noteOn(this.startTime);
-	} else {
-		source.start(this.startTime);
-	}
+	source.start(this.startTime);
 
 	this.startTime += duration;
 	this.wallclockStartTime += duration;
@@ -112,12 +108,12 @@ WebAudioOut.prototype.unlock = function(callback) {
 	var source = this.context.createBufferSource();
 	source.buffer = buffer;
 	source.connect(this.destination);
-	if (source.hasOwnProperty('noteOn')) {
-		source.noteOn(0);
-	} else if (source.hasOwnProperty('play')) {
-		source.play(0);
-	} else {
+	if (source.start){
 		source.start(0);
+	} else if (source.noteOn) {
+		source.noteOn(0);
+	} else {
+		new Error('WebAudioOut error #1')
 	}
 
 	setTimeout(this.checkIfUnlocked.bind(this, source, 0), 0);
@@ -141,7 +137,8 @@ WebAudioOut.prototype.checkIfUnlocked = function(source, attempt) {
 };
 
 WebAudioOut.NeedsUnlocking = function(context) {
-	return context.state === 'suspended';
+	//return context.state === 'suspended';
+	return /iPhone|iPad|iPod/i.test(navigator.userAgent)
 };
 
 WebAudioOut.IsSupported = function() {
