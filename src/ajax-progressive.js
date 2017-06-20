@@ -36,7 +36,7 @@ AjaxProgressiveSource.prototype.start = function() {
 	}.bind(this);
 
 	this.request.onprogress = this.onProgress.bind(this);
-	this.request.open('HEAD', this.url, true);
+	this.request.open('HEAD', this.url);
 	this.request.send();
 };
 
@@ -90,7 +90,7 @@ AjaxProgressiveSource.prototype.loadNextChunk = function() {
 		this.request.onprogress = this.onProgress.bind(this);
 	}
 
-	this.request.open('GET', this.url+'#'+start+"-"+end, true);
+	this.request.open('GET', this.url+'#'+start+"-"+end);
 	this.request.setRequestHeader("Range", "bytes="+start+"-"+end);
 	this.request.responseType = "arraybuffer";
 	this.request.send();
