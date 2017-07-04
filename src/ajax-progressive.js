@@ -30,6 +30,7 @@ AjaxProgressiveSource.prototype.start = function() {
 	this.request.onreadystatechange = function() {
 		if (this.request.readyState === this.request.DONE) {
 			var length = this.request.getResponseHeader("Content-Length")
+			console.log(this.request.getAllResponseHeaders())
 			this.fileSize = parseInt(length);
 			this.loadNextChunk();
 		}
