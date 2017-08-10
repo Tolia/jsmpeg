@@ -91,7 +91,7 @@ AjaxProgressiveSource.prototype.loadNextChunk = function() {
 		this.request.onprogress = this.onProgress.bind(this);
 	}
 
-	this.request.open('GET', this.url+'#'+start+"-"+end, true);
+	this.request.open('GET', this.url+'?start='+start+"&end="+end, true);
 	this.request.setRequestHeader("Range", "bytes="+start+"-"+end);
 	this.request.responseType = "arraybuffer";
 	this.request.send();
