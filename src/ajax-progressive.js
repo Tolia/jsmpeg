@@ -78,8 +78,9 @@ AjaxProgressiveSource.prototype.loadNextChunk = function() {
 			this.request.status >= 200 && this.request.status < 300
 		) {
 			this.onChunkLoad(this.request.response);
-		}
-		else if (this.request.readyState === this.request.DONE) {
+			if (this.options.hasOwnProperty('onLoad'))
+				this.options.onLoad(end / this.fileSize );
+		} else if (this.request.readyState === this.request.DONE) {
 			// Retry?
 			if (this.loadFails++ < 3) {
 				this.loadNextChunk();
@@ -110,14 +111,10 @@ AjaxProgressiveSource.prototype.onChunkLoad = function(data) {
 	if (this.destination) {
 		this.destination.write(data);
 	}
-
 	this.loadTime = Now() - this.loadStartTime;
+
 	if (!this.throttled) {
 		this.loadNextChunk();
-	}
-
-	if (this.options.onLoad) {
-		this.options.onLoad();
 	}
 };
 
