@@ -162,6 +162,8 @@ Player.prototype.setCurrentTime = function(time) {
 };
 
 Player.prototype.update = function() {
+	if (this.wantsToPlay === false) return
+
 	this.animationId = requestAnimationFrame(this.update.bind(this));
 
 	if (!this.source.established) {
