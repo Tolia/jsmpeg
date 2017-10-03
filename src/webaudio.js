@@ -29,7 +29,9 @@ WebAudioOut.prototype.destroy = function() {
 	this.context._connections--;
 
 	if (this.context._connections === 0) {
-		this.context.close();
+		if (this.context.close) {
+			this.context.close();
+		}
 		WebAudioOut.CachedContext = null;
 	}
 };
