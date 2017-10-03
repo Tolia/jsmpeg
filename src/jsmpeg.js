@@ -97,7 +97,7 @@ export var AudioOutput = {
 };
 
 export var Now = function() {
-	return window.performance
+	return window.performance && window.performance.now
 		? window.performance.now() / 1000
 		: Date.now() / 1000;
 };
