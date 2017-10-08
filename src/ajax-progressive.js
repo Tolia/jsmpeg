@@ -10,7 +10,7 @@ export var AjaxProgressiveSource = function(url, options) {
 	this.established = false;
 	this.progress = 0;
 
-	this.fileSize = 0;
+	this.fileSize = options.fileSize || 0;
 	this.loadedSize = 0;
 	this.chunkSize = options.chunkSize || 1024*1024;
 
@@ -25,20 +25,26 @@ AjaxProgressiveSource.prototype.connect = function(destination) {
 };
 
 AjaxProgressiveSource.prototype.start = function() {
-	this.request = new XMLHttpRequest();
+	if (this.fileSize === 0) {
 
-	this.request.onreadystatechange = function() {
-		if (this.request.readyState === this.request.DONE) {
-			var length = this.request.getResponseHeader("Content-Length")
-			console.log(this.request.getAllResponseHeaders())
-			this.fileSize = parseInt(length);
-			this.loadNextChunk();
-		}
-	}.bind(this);
+		this.request = new XMLHttpRequest();
 
-	this.request.onprogress = this.onProgress.bind(this);
-	this.request.open('HEAD', this.url, true);
-	this.request.send();
+		this.request.onreadystatechange = function() {
+			if (this.request.readyState === this.request.DONE) {
+				var length = this.request.getResponseHeader("Content-Length")
+				console.log(this.request.getAllResponseHeaders())
+				this.fileSize = parseInt(length);
+				this.loadNextChunk();
+			}
+		}.bind(this);
+
+		this.request.onprogress = this.onProgress.bind(this);
+		this.request.open('HEAD', this.url, true);
+		this.request.send();
+
+	} else {
+		this.loadNextChunk();
+	}
 };
 
 AjaxProgressiveSource.prototype.resume = function(secondsHeadroom) {
