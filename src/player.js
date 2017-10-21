@@ -186,6 +186,14 @@ Player.prototype.update = function() {
 	else {
 		this.updateForStaticFile();
 	}
+
+	this.touchUpdateListener();
+};
+
+Player.prototype.touchUpdateListener = function() {
+	if (this.options.hasOwnProperty('onSecondsTick')) {
+		this.options.onSecondsTick(this.currentTime)
+	}
 };
 
 Player.prototype.updateForStreaming = function() {
@@ -234,7 +242,6 @@ Player.prototype.updateForStaticFile = function() {
 
 		headroom = this.demuxer.currentTime - this.audio.currentTime;
 	}
-
 
 	else if (this.video) {
 		// Video only - sync it to player's wallclock
