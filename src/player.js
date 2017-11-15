@@ -230,13 +230,13 @@ Player.prototype.updateForStaticFile = function() {
 		// Do we have to decode and enqueue some more audio data?
 		while (
 			!notEnoughData &&
-			this.audio.decodedTime - this.audio.currentTime < 0.25
+			this.audio.decodedTime - this.audio.currentTime < this.maxAudioLag
 		) {
 			notEnoughData = !this.audio.decode();
 		}
 
 		// Sync video to audio
-		if (this.video && this.video.currentTime < this.audio.currentTime) {
+		if (!notEnoughData && this.video && this.video.currentTime < this.audio.currentTime) {
 			notEnoughData = !this.video.decode();
 		}
 
@@ -245,18 +245,18 @@ Player.prototype.updateForStaticFile = function() {
 
 	else if (this.video) {
 		// Video only - sync it to player's wallclock
-		var targetTime = (Now() - this.startTime) + this.video.startTime,
-			lateTime = targetTime - this.video.currentTime,
-			frameTime = 1/this.video.frameRate;
+		var targetTime = (Now() - this.startTime) + this.video.startTime;
+		var	lateTime = targetTime - this.video.currentTime;
 
 		if (this.video && lateTime > 0) {
+			var	frameTime = 1/this.video.frameRate;
 			// If the video is too far behind (>2 frames), simply reset the
 			// target time to the next frame instead of trying to catch up.
 			if (lateTime > frameTime * 2) {
 				this.startTime += lateTime;
 			}
 
-			notEnoughData = !this.video.decode();
+			notEnoughData = notEnoughData || this.video.decode();
 		}
 
 		headroom = this.demuxer.currentTime - targetTime;
