@@ -117,7 +117,7 @@ AjaxProgressiveSource.prototype.onChunkLoad = function(data) {
 	}
 	this.loadTime = Now() - this.loadStartTime;
 
-	if (this.options.hasOwnProperty('onLoad')) {
+	if (!!this.options.onLoad) {
 		this.options.onLoad(this.loadedSize, this.fileSize, this.loadTime);
 	}
 

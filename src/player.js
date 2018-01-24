@@ -191,7 +191,7 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.touchUpdateListener = function() {
-	if (this.options.hasOwnProperty('onSecondsTick') && !!this.options.onSecondsTick) {
+	if (!!this.options.onSecondsTick) {
 		this.options.onSecondsTick(this.currentTime)
 	}
 };
